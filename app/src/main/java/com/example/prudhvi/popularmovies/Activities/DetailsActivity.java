@@ -11,6 +11,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.prudhvi.popularmovies.R;
+import com.example.prudhvi.popularmovies.Utils.Connection;
+import com.example.prudhvi.popularmovies.Utils.Constant;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
@@ -18,11 +20,12 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class DetailsActivity extends AppCompatActivity {
-String title,overview,poster,rating,release_date;
+    @BindView(R.id.Movie_rating)
+    TextView T_rating;
 @BindView(R.id.Movie_title)   TextView T_title;
     @BindView(R.id.Movie_Overview)   TextView T_overview;
     @BindView(R.id.Movie_releasedate)   TextView T_releasedate;
-    @BindView(R.id.Movie_rating)   TextView T_rating;
+    private String title, overview, poster, rating, release_date;
     @BindView(R.id.Movie_poster)    ImageView T_poster;
     @BindView(R.id.progressBar) ProgressBar progressBar;
 
@@ -33,22 +36,27 @@ String title,overview,poster,rating,release_date;
         ButterKnife.bind(this);
 
         ActionBar actionBar=getSupportActionBar();
+        Connection connection = new Connection(getApplicationContext());
 
        Intent i=getIntent();
                if(i!=null){
 
-            title=i.getStringExtra("Movie_title");
-                   overview=i.getStringExtra("Movie_synopsis");
-                   poster=i.getStringExtra("Movie_poster_url");
-                   rating=i.getStringExtra("Movie_rating");
-                   release_date=i.getStringExtra("Movie_release_date");
+                   title = i.getStringExtra(Constant.MOVIE_TITLE);
+                   overview = i.getStringExtra(Constant.MOVIE_OVERVIEW);
+                   poster = i.getStringExtra(Constant.MOVIE_POSTER);
+                   rating = i.getStringExtra(Constant.MOVIE_RATING);
+                   release_date = i.getStringExtra(Constant.MOVIE_RELEASE_DATE);
                    actionBar.setTitle(title);
                     T_title.setText(title);
                     T_overview.setText(overview);
                     T_rating.setText(rating);
                     T_releasedate.setText(release_date);
 
-                   Picasso.with(getApplicationContext()).load("http://image.tmdb.org/t/p/w500"+poster).into(T_poster, new Callback() {
+                   if (!connection.isInternet()) {
+                       Toast.makeText(getApplicationContext(), R.string.no_internet, Toast.LENGTH_SHORT).show();
+                       progressBar.setVisibility(View.GONE);
+                   } else {
+                       Picasso.with(getApplicationContext()).load(Constant.BIG_IMAGE_URL + poster).into(T_poster, new Callback() {
                        @Override
                        public void onSuccess() {
                            progressBar.setVisibility(View.GONE);
@@ -61,8 +69,9 @@ String title,overview,poster,rating,release_date;
 
                        }
                    });
-               }else{
-                   Toast.makeText(getApplicationContext(),"No Data Available ",Toast.LENGTH_LONG).show();
+                   }
+               } else {
+                   Toast.makeText(getApplicationContext(), R.string.no_data_error, Toast.LENGTH_LONG).show();
                }
 
     }

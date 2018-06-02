@@ -10,6 +10,7 @@
         android:layout_gravity="center"
         android:scaleType="centerCrop"
         android:adjustViewBounds="true"
+        android:contentDescription="@string/model_image"
         android:id="@+id/model_imageview"/>
 
 </LinearLayout>

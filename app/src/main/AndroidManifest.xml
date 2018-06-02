@@ -3,6 +3,7 @@
     package="com.example.prudhvi.popularmovies">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
         android:allowBackup="true"
@@ -24,7 +25,7 @@
             android:name=".Activities.DetailsActivity"
             android:label="@string/title_activity_details"
             android:parentActivityName=".Activities.MainActivity"
-            android:theme="@style/AppTheme"></activity>
+            android:theme="@style/AppTheme" />
     </application>
 
 </manifest>

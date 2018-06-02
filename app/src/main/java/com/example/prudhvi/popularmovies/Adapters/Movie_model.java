@@ -1,20 +1,14 @@
 package com.example.prudhvi.popularmovies.Adapters;
 
 public class Movie_model {
-    String Movie_id;
-    String Movie_title;
-    String Movie_synopsis;
-    String Movie_rating;
-    String Movie_release_date;
-    String Movie_poster_url;
 
-    public String getMovie_id() {
-        return Movie_id;
-    }
+    private String Movie_title;
+    private String Movie_synopsis;
+    private String Movie_rating;
+    private String Movie_release_date;
+    private String Movie_poster_url;
 
-    public void setMovie_id(String movie_id) {
-        Movie_id = movie_id;
-    }
+
 
     public String getMovie_title() {
         return Movie_title;
