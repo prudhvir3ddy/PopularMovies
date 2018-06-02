@@ -4,7 +4,7 @@
 
     <item
         android:id="@+id/miSpinner"
-        android:title="This"
+        android:title="@string/menu_title"
         app:actionViewClass="android.widget.Spinner"
         app:showAsAction="always" />
 
