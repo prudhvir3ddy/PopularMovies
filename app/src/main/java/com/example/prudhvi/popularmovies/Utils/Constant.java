@@ -3,7 +3,7 @@ package com.example.prudhvi.popularmovies.Utils;
 public class Constant {
     public static final String TOP_RATED_URL = "http://api.themoviedb.org/3/movie/top_rated";
     public static final String POPULAR_URL = "http://api.themoviedb.org/3/movie/popular";
-    public static final String API_KEY = "18cf2b85d1c884adf82cee0c501062d3";
+    public static final String API_KEY = "";
 
 
     public static final String SMALL_IMAGE_URL = "http://image.tmdb.org/t/p/w185";
