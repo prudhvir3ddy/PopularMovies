@@ -4,7 +4,7 @@ udacity nanodegree project to show latest popular and top rated movies from them
 # Setup 
 
 1. get API key from themoviedb.org website
-2. add key in utils/Constant.java file at API_KEY Constant String
+2. add key in app/build.gradle file at buildConfigField
 3. Run The App
 
 
