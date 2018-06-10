@@ -1,9 +1,24 @@
 package com.example.prudhvi.popularmovies.Models;
 
-public class Movie_model {
+import android.os.Parcel;
+import android.os.Parcelable;
+
+public class Movie_model implements Parcelable {
 
     private String Movie_title;
     private String Movie_synopsis;
+
+    public static final Parcelable.Creator<Movie_model> CREATOR = new Parcelable.Creator<Movie_model>() {
+        public Movie_model createFromParcel(Parcel source) {
+            return new Movie_model(source);
+        }
+
+        @Override
+        public Movie_model[] newArray(int size) {
+            return new Movie_model[size];
+        }
+    };
+
     private String Movie_rating;
     private String Movie_release_date;
     private String Movie_poster_url;
@@ -63,5 +78,30 @@ public class Movie_model {
     }
 
 
+    public Movie_model(Parcel in) {
+        Movie_id = in.readString();
+        Movie_title = in.readString();
+        Movie_poster_url = in.readString();
+        Movie_synopsis = in.readString();
+        Movie_rating = in.readString();
+        Movie_release_date = in.readString();
 
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(Movie_id);
+        dest.writeString(Movie_title);
+        dest.writeString(Movie_poster_url);
+        dest.writeString(Movie_synopsis);
+        dest.writeString(Movie_rating);
+        dest.writeString(Movie_release_date);
+
+
+    }
 }

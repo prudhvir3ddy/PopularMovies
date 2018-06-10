@@ -61,6 +61,8 @@ public class DetailsActivity extends AppCompatActivity {
     ArrayList<Reviews_Model> review_list=new ArrayList<>() ;
     TrailersAdapter trailersAdapter;
     ReviewsAdapter reviewsAdapter;
+    private static final String TrailersArrayKey = "taK";
+    private static final String ReviewArrayKey = "raK";
      int f=0, count=0;
 
     @Override
@@ -72,56 +74,72 @@ public class DetailsActivity extends AppCompatActivity {
         ActionBar actionBar=getSupportActionBar();
         Connection connection = new Connection(getApplicationContext());
 
-       Intent i=getIntent();
-               if(i!=null){
-                    id=i.getStringExtra(Constant.MOVIE_ID);
-                   title = i.getStringExtra(Constant.MOVIE_TITLE);
-                   overview = i.getStringExtra(Constant.MOVIE_OVERVIEW);
-                   poster = i.getStringExtra(Constant.MOVIE_POSTER);
-                   rating = i.getStringExtra(Constant.MOVIE_RATING);
-                   release_date = i.getStringExtra(Constant.MOVIE_RELEASE_DATE);
-                   actionBar.setTitle(title);
-                    T_title.setText(title);
-                    T_overview.setText(overview);
-                    T_rating.setText(rating);
-                    T_releasedate.setText(release_date);
-                    Log.v("id",id);
-                   Cursor cursor=getContentResolver().query(MoviesContract.MoviesEntry.CONTENT_URI,null,id,null,null);
-                       count =cursor.getCount();
-                   if (count!=0){
-                       cursor.moveToFirst();
-                       Log.v("movie name",""+cursor.getString(cursor.getColumnIndex(MoviesContract.MoviesEntry.COLUMN_MOVIE_NAME)));
 
-                       Log.v("count", String.valueOf(count));
-                        add_Fav.setText("Remove from Favourites");
-                        f=1;
-                    }
-                    cursor.close();
-
-                   if (!connection.isInternet()) {
-                       Toast.makeText(getApplicationContext(), R.string.no_internet, Toast.LENGTH_SHORT).show();
-                       progressBar.setVisibility(View.GONE);
-                   } else {
+        if (savedInstanceState != null) {
+            id = savedInstanceState.getString(Constant.MOVIE_ID);
+            title = savedInstanceState.getString(Constant.MOVIE_TITLE);
+            overview = savedInstanceState.getString(Constant.MOVIE_OVERVIEW);
+            poster = savedInstanceState.getString(Constant.MOVIE_POSTER);
+            rating = savedInstanceState.getString(Constant.MOVIE_RATING);
+            release_date = savedInstanceState.getString(Constant.MOVIE_RELEASE_DATE);
+            list = savedInstanceState.getParcelableArrayList(TrailersArrayKey);
+            review_list = savedInstanceState.getParcelableArrayList(ReviewArrayKey);
+        } else {
+            Intent i = getIntent();
+            if (i != null) {
+                id = i.getStringExtra(Constant.MOVIE_ID);
+                title = i.getStringExtra(Constant.MOVIE_TITLE);
+                overview = i.getStringExtra(Constant.MOVIE_OVERVIEW);
+                poster = i.getStringExtra(Constant.MOVIE_POSTER);
+                rating = i.getStringExtra(Constant.MOVIE_RATING);
+                release_date = i.getStringExtra(Constant.MOVIE_RELEASE_DATE);
+            } else {
+                Toast.makeText(getApplicationContext(), R.string.no_data_error, Toast.LENGTH_LONG).show();
+                finish();
+            }
+            if (!connection.isInternet()) {
+                Toast.makeText(getApplicationContext(), R.string.no_internet, Toast.LENGTH_SHORT).show();
+                progressBar.setVisibility(View.GONE);
+                finish();
+            } else {
                        fetchtrailers(Constant.URL+""+id+"/"+Constant.TRAILERS_URL);
-                       fetchreviews(Constant.URL+""+id+"/"+Constant.REVIEWS_URL);
-                       Picasso.with(getApplicationContext()).load(Constant.BIG_IMAGE_URL + poster).into(T_poster, new Callback() {
-                       @Override
-                       public void onSuccess() {
-                           progressBar.setVisibility(View.GONE);
-                       }
+                fetchreviews(Constant.URL + "" + id + "/" + Constant.REVIEWS_URL);
+            }
 
-                       @Override
-                       public void onError() {
-                           progressBar.setVisibility(View.GONE);
-                           Toast.makeText(getApplicationContext(), R.string.image_error,Toast.LENGTH_SHORT).show();
 
-                       }
-                   });
-                   }
-               } else {
-                   Toast.makeText(getApplicationContext(), R.string.no_data_error, Toast.LENGTH_LONG).show();
-               }
-               t_recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL,false));
+        }
+        Picasso.with(getApplicationContext()).load(Constant.BIG_IMAGE_URL + poster).into(T_poster, new Callback() {
+            @Override
+            public void onSuccess() {
+                progressBar.setVisibility(View.GONE);
+            }
+
+            @Override
+            public void onError() {
+                progressBar.setVisibility(View.GONE);
+                Toast.makeText(getApplicationContext(), R.string.image_error, Toast.LENGTH_SHORT).show();
+
+            }
+        });
+        Cursor cursor = getContentResolver().query(MoviesContract.MoviesEntry.CONTENT_URI, null, id, null, null);
+        count = cursor.getCount();
+        if (count != 0) {
+            cursor.moveToFirst();
+            Log.v("movie name", "" + cursor.getString(cursor.getColumnIndex(MoviesContract.MoviesEntry.COLUMN_MOVIE_NAME)));
+
+            Log.v("count", String.valueOf(count));
+            add_Fav.setText("Remove from Favourites");
+            f = 1;
+        }
+        cursor.close();
+        actionBar.setTitle(title);
+        T_title.setText(title);
+        T_overview.setText(overview);
+        T_rating.setText(rating);
+        T_releasedate.setText(release_date);
+        Log.v("id", id);
+
+        t_recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
 
         trailersAdapter = new TrailersAdapter(getApplicationContext(),list);
 
@@ -176,6 +194,20 @@ public class DetailsActivity extends AppCompatActivity {
 
         });
 
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putString(Constant.MOVIE_ID, id);
+        outState.putString(Constant.MOVIE_TITLE, title);
+        outState.putString(Constant.MOVIE_OVERVIEW, overview);
+        outState.putString(Constant.MOVIE_POSTER, poster);
+        outState.putString(Constant.MOVIE_RATING, rating);
+        outState.putString(Constant.MOVIE_RELEASE_DATE, release_date);
+        outState.putParcelableArrayList(TrailersArrayKey, list);
+        outState.putParcelableArrayList(ReviewArrayKey, review_list);
+        Log.v("inside savedstate2", "   ");
+        super.onSaveInstanceState(outState);
     }
 
     private void fetchreviews(String s) {
