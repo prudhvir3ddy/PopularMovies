@@ -1,5 +1,6 @@
 package com.example.prudhvi.popularmovies.Activities;
 
+import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
@@ -22,11 +23,12 @@ import com.androidnetworking.AndroidNetworking;
 import com.androidnetworking.common.Priority;
 import com.androidnetworking.error.ANError;
 import com.androidnetworking.interfaces.JSONObjectRequestListener;
-import com.example.prudhvi.popularmovies.Adapters.Movie_model;
+import com.example.prudhvi.popularmovies.Models.Movie_model;
 import com.example.prudhvi.popularmovies.Adapters.RecyclerViewAdapter;
 import com.example.prudhvi.popularmovies.R;
 import com.example.prudhvi.popularmovies.Utils.Connection;
 import com.example.prudhvi.popularmovies.Utils.Constant;
+import com.example.prudhvi.popularmovies.data.MoviesContract;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -41,9 +43,11 @@ public class MainActivity extends AppCompatActivity {
     RecyclerView recyclerView;
     @BindView(R.id.toolbar)
     Toolbar toolbar;
+      Object item="Popular";
     RecyclerViewAdapter adapter;
+    private static final String SpinnerKey = "sK";
     private ArrayList<Movie_model> list;
-
+    Cursor cursor;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,6 +55,12 @@ public class MainActivity extends AppCompatActivity {
         AndroidNetworking.initialize(getApplicationContext());
         ButterKnife.bind(this);
         Connection connection = new Connection(getApplicationContext());
+        if(savedInstanceState!=null){
+
+            CharSequence savedText = savedInstanceState.getCharSequence(SpinnerKey);
+            item=savedText;
+            Log.v("inside savedstate",savedText+"   "+item.toString());
+        }
         if (!connection.isInternet())
             Toast.makeText(getApplicationContext(), R.string.no_internet, Toast.LENGTH_SHORT).show();
 
@@ -61,10 +71,18 @@ public class MainActivity extends AppCompatActivity {
         RecyclerView.LayoutManager linearLayoutManager = new GridLayoutManager(getApplicationContext(),2);
         recyclerView.setLayoutManager(linearLayoutManager);
         list=new ArrayList<>();
-       adapter = new RecyclerViewAdapter(getApplicationContext(),list);
+       adapter = new RecyclerViewAdapter(MainActivity.this,list);
         recyclerView.setAdapter(adapter);
 
     }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putString(SpinnerKey, item.toString());
+        Log.v("inside savedstate2","   "+item.toString());
+        super.onSaveInstanceState(outState);
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.drawer_menu, menu);
@@ -73,33 +91,62 @@ public class MainActivity extends AppCompatActivity {
         spinner.getBackground().setColorFilter(getResources().getColor(android.R.color.white), PorterDuff.Mode.SRC_ATOP);
         final ArrayAdapter<CharSequence> spinnerAdapter = ArrayAdapter.createFromResource(this, R.array.choice, android.R.layout.simple_spinner_dropdown_item);
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
         spinner.setAdapter(spinnerAdapter);
+        spinner.setSelection(spinnerAdapter.getPosition(item.toString()));
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
 
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view,
                                        int position, long id) {
-                Object item = adapterView.getItemAtPosition(position);
+                item = adapterView.getItemAtPosition(position);
                 ((TextView) adapterView.getChildAt(0)).setTextColor(Color.WHITE);
 
                 if (item.toString().equals("Popular")) {
                     list.clear();
                     adapter.refresh(list);
-                    fetchdata(Constant.POPULAR_URL);
+                    fetchdata(Constant.URL + "" + Constant.POPULAR_URL);
 
                 }
                 if (item.toString().equals("Top Rated")) {
                     list.clear();
                     adapter.refresh(list);
-                    fetchdata(Constant.TOP_RATED_URL);
+                    fetchdata(Constant.URL + "" + Constant.TOP_RATED_URL);
                 }
+                if (item.toString().equals("Favourites")) {
+                    list.clear();
+                         cursor = getContentResolver().query(MoviesContract.MoviesEntry.CONTENT_URI,
+                                null,
+                                null,
+                                null,
+                                null);
 
 
+                    if (cursor != null) {
+                        cursor.moveToFirst();
+
+                        while (!cursor.isAfterLast()) {
+
+                            Movie_model movie_model = new Movie_model();
+                            movie_model.setMovie_id(cursor.getString(cursor.getColumnIndex(MoviesContract.MoviesEntry.COLUMN_MOVIE_ID)));
+                            movie_model.setMovie_poster_url(cursor.getString(cursor.getColumnIndex(MoviesContract.MoviesEntry.COLUMN_POSTER_URL)));
+                            movie_model.setMovie_rating(cursor.getString(cursor.getColumnIndex(MoviesContract.MoviesEntry.COLUMN_RATING)));
+                            movie_model.setMovie_release_date(cursor.getString(cursor.getColumnIndex(MoviesContract.MoviesEntry.COLUMN_DATE)));
+                            movie_model.setMovie_synopsis(cursor.getString(cursor.getColumnIndex(MoviesContract.MoviesEntry.COLUMN_OVERVIEW)));
+                            movie_model.setMovie_title(cursor.getString(cursor.getColumnIndex(MoviesContract.MoviesEntry.COLUMN_MOVIE_NAME)));
+                            list.add(movie_model);
+                            cursor.moveToNext();
+                        }
+                        cursor.close();
+
+                    }
+                    adapter.refresh(list);
+
+                }
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> adapterView) {
-
 
             }
         });
@@ -124,11 +171,11 @@ public class MainActivity extends AppCompatActivity {
                         for(int i=0;i<results.length();i++) {
                             JSONObject result= results.optJSONObject(i);
                             Movie_model movie_model = new Movie_model();
+                            movie_model.setMovie_id(result.optString(Constant.MOVIE_ID));
                             movie_model.setMovie_rating(result.optString(Constant.MOVIE_RATING));
                             movie_model.setMovie_release_date(result.optString(Constant.MOVIE_RELEASE_DATE));
                             movie_model.setMovie_synopsis(result.optString(Constant.MOVIE_OVERVIEW));
                             movie_model.setMovie_title(result.optString(Constant.MOVIE_TITLE));
-
                             movie_model.setMovie_poster_url(result.optString(Constant.MOVIE_POSTER));
                         list.add(i,movie_model);
                         }

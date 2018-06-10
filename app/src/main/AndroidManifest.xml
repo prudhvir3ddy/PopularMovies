@@ -21,6 +21,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <provider
+            android:name=".data.MoviesContentProvider"
+            android:authorities="com.example.prudhvi.popularmovies"
+            android:exported="false" />
         <activity
             android:name=".Activities.DetailsActivity"
             android:label="@string/title_activity_details"

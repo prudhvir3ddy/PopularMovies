@@ -1,5 +1,6 @@
 package com.example.prudhvi.popularmovies.Adapters;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
@@ -10,6 +11,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.example.prudhvi.popularmovies.Activities.DetailsActivity;
+import com.example.prudhvi.popularmovies.Activities.MainActivity;
+import com.example.prudhvi.popularmovies.Models.Movie_model;
 import com.example.prudhvi.popularmovies.R;
 import com.example.prudhvi.popularmovies.Utils.Constant;
 import com.squareup.picasso.Picasso;
@@ -43,12 +46,13 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         @Override
         public void onClick(View view) {
             Intent i = new Intent(mContext, DetailsActivity.class);
-
+            i.putExtra(Constant.MOVIE_ID,temp_model.getMovie_id());
             i.putExtra(Constant.MOVIE_TITLE, temp_model.getMovie_title());
             i.putExtra(Constant.MOVIE_OVERVIEW, temp_model.getMovie_synopsis());
             i.putExtra(Constant.MOVIE_RATING, temp_model.getMovie_rating());
             i.putExtra(Constant.MOVIE_RELEASE_DATE, temp_model.getMovie_release_date());
             i.putExtra(Constant.MOVIE_POSTER, temp_model.getMovie_poster_url());
+
             mContext.startActivity(i);
 
         }
