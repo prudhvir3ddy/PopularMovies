@@ -10,7 +10,7 @@
       android:layout_width="wrap_content"
       android:layout_height="match_parent"
       app:cardUseCompatPadding="true"
-      app:cardElevation="5dp"
+      app:cardElevation="@dimen/elevation"
       >
       <LinearLayout
           android:layout_width="match_parent"
@@ -20,24 +20,21 @@
               android:layout_width="match_parent"
               android:layout_height="wrap_content"
               android:orientation="horizontal"
-              android:layout_marginTop="16dp"
-              android:layout_marginBottom="16dp">
+              android:layout_marginBottom="@dimen/margin_med"
+              android:layout_marginTop="@dimen/margin_med">
               <TextView
                   android:layout_width="match_parent"
                   android:layout_height="match_parent"
                   android:textStyle="bold"
-
                   android:layout_weight="1"
                   android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                  android:text="Author :"/>
+                  android:text="@string/author" />
 
   <TextView
       android:layout_weight="1"
       android:layout_width="match_parent"
       android:layout_height="match_parent"
-
       android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-
       android:id="@+id/review_author"/>
           </LinearLayout>
 
